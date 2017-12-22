@@ -29,6 +29,9 @@ public class Logout extends HttpServlet {
         session.removeAttribute("authStatus");
         session.removeAttribute("username");
         session.removeAttribute("fullName");
+        session.invalidate();
+        
+        response.setHeader("Refresh", "5;url=index.jsp");
         
         response.setContentType("text/html;charset=UTF-8");
         try (PrintWriter out = response.getWriter()) {
@@ -39,7 +42,6 @@ public class Logout extends HttpServlet {
             out.println("<title>Logout</title>");            
             out.println("</head>");
             
-            response.setHeader("Refresh", "5;url=index.jsp");
             out.println("<center><h2>You have successfully logged out. Now you are not priviledge to access the secure area</h2></center>");
             out.println("<center><h2>You will be redirected to Home in 5 secs.</h2></center>");
             
