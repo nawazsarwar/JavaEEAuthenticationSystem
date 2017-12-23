@@ -1,3 +1,5 @@
+package com.wabasta.javaeeauthenticationsystem;
+
 import java.io.IOException;
 import java.io.PrintWriter;
 import javax.servlet.ServletException;
@@ -10,8 +12,8 @@ import javax.servlet.http.HttpSession;
 /**
  * @author nawazsarwar
  */
-@WebServlet(urlPatterns = {"/Logout"})
-public class Logout extends HttpServlet {
+@WebServlet(urlPatterns = {"/AuthServlet"})
+public class AuthServlet extends HttpServlet {
 
     /**
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
@@ -25,27 +27,43 @@ public class Logout extends HttpServlet {
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         
-        HttpSession session = request.getSession();
-        session.removeAttribute("authStatus");
-        session.removeAttribute("username");
-        session.removeAttribute("fullName");
-        session.invalidate();
+        String dbStoredUsername = "admin";
+        String dbStoredPassword = "admin";
         
-        response.setHeader("Refresh", "5;url=index.jsp");
+        String username, password;
+        boolean authStatus = false;
         
         response.setContentType("text/html;charset=UTF-8");
         try (PrintWriter out = response.getWriter()) {
+            
             /* TODO output your page here. You may use following sample code. */
             out.println("<!DOCTYPE html>");
             out.println("<html>");
             out.println("<head>");
-            out.println("<title>Logout</title>");            
+            out.println("<title>Servlet AuthServlet</title>");            
             out.println("</head>");
-            
-            out.println("<center><h2>You have successfully logged out. Now you are not priviledge to access the secure area</h2></center>");
-            out.println("<center><h2>You will be redirected to Home in 5 secs.</h2></center>");
-            
             out.println("<body>");
+            
+            if(request.getParameter("inputEmail").equals(dbStoredUsername) && 
+                    request.getParameter("inputPassword").equals(dbStoredPassword)){
+                
+                HttpSession session = request.getSession();
+                session.setAttribute("authStatus", 1);
+                session.setAttribute("username", request.getParameter("inputEmail"));
+                session.setAttribute("fullName", "John Doe");
+                
+                response.setHeader("Refresh", "5;url=dashboard.jsp");
+                out.println("<center><h2>Authentication is successful. Now you are granted priviledge to access the secure area</h2></center>");
+                out.println("<center><h2>You will be redirected to Dashboard in 5 secs.</h2></center>");
+            
+            } else {
+                response.setHeader("Refresh", "5;url=login.jsp");
+                out.println("<center><h2>Authentication failed. Login credentials don't match. <a href='login.jsp'>Go back</a> and try again.</h2></center>");
+                out.println("<center><h2>You will be redirected to Login in 5 secs.</h2></center>");
+            }
+            
+            
+//            out.println("<h1>Servlet AuthServlet at " + request.getContextPath() + "</h1>");
             out.println("</body>");
             out.println("</html>");
         }
